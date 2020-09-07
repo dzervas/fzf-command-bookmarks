@@ -1,0 +1,1 @@
+fzf-command-bookmarks.sh

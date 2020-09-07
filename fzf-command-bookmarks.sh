@@ -21,8 +21,8 @@ function _fzf_command_bookmark_add() {
 	local REPLY
 
 	if [ -z "$CMD" ]; then
-		if [ -z ZSH_VERSION ]; then
-			echo -n "Command to add: "
+		if [ -z "$ZSH_VERSION" ]; then
+			echo -en "\nCommand to add: "
 			read -er CMD
 		else
 			autoload -Uz read-from-minibuffer
@@ -32,11 +32,13 @@ function _fzf_command_bookmark_add() {
 	fi
 
 	if [ -z "$TITLE" ]; then
-		if [ ! -z ZSH_VERSION ]; then
+		if [ -z "$ZSH_VERSION" ]; then
+			echo -n "Command title: "
+			read -er TITLE
+		else
 			zle -I
+			read -r "TITLE?Command title: " < /dev/tty
 		fi
-		echo -n "Command title: "
-		read -er TITLE
 	fi
 
 	echo -e "${CMD}##${TITLE}" >> $FZF_COMMAND_BOOKMARKS_FILE
