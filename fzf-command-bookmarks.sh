@@ -8,11 +8,34 @@ export FZF_COMMAND_BOOKMARKS_ADD="\C-k"
 export FZF_COMMAND_BOOKMARKS_SHOW="\C-@"
 
 
+# Readline magic helper for bash
+# Found here: https://github.com/junegunn/fzf/wiki/examples#with-write-to-terminal-capabilities
+function __ehc() {
+	if [[ -n $1 ]]; then
+		bind '"\er": redraw-current-line'
+		bind '"\e^": magic-space'
+		READLINE_LINE=${READLINE_LINE:+${READLINE_LINE:0:READLINE_POINT}}${1}${READLINE_LINE:+${READLINE_LINE:READLINE_POINT}}
+		READLINE_POINT=$(( READLINE_POINT + ${#1} ))
+	else
+		bind '"\er":'
+		bind '"\e^":'
+	fi
+}
+
 function _fzf_command_bookmark_show() {
-	cat $FZF_COMMAND_BOOKMARKS_FILE | \
-		fzf --delimiter "##" --print0 --height 40% --header Bookmarks --with-nth 2\
+	local result=$(cat $FZF_COMMAND_BOOKMARKS_FILE | \
+		fzf --delimiter "##" --print0 --height 40% --header Bookmarks --with-nth 2 \
 		--preview 'echo -e {2}; echo; echo {1} | highlight -S bash -O ansi' \
-		--preview-window=wrap --tac
+		--preview-window=wrap --tac | cut -d'#' -f1)
+	# The `cut` above uses a single hashtag as a delimiter, but we need only
+	# the first part so it's fine
+
+	if [ -z "$ZSH_VERSION" ]; then
+		__ehc "$result"
+	else
+		LBUFFER="$LBUFFER$result"
+		zle reset-prompt
+	fi
 }
 
 function _fzf_command_bookmark_add() {
