@@ -25,7 +25,7 @@ function __ehc() {
 function _fzf_command_bookmark_show() {
 	local result=$(cat $FZF_COMMAND_BOOKMARKS_FILE | \
 		fzf --delimiter "##" --print0 --height 40% --header Bookmarks --with-nth 2 \
-		--preview 'echo -e {2}; echo; echo {1} | highlight -S bash -O ansi' \
+		--preview 'echo -e {2}; echo; echo -E {1} | highlight -S bash -O ansi' \
 		--preview-window=wrap --tac | cut -d'#' -f1)
 	# The `cut` above uses a single hashtag as a delimiter, but we need only
 	# the first part so it's fine
@@ -64,7 +64,7 @@ function _fzf_command_bookmark_add() {
 		fi
 	fi
 
-	echo -e "${CMD}##${TITLE}" >> $FZF_COMMAND_BOOKMARKS_FILE
+	echo -E "${CMD}##${TITLE}" >> $FZF_COMMAND_BOOKMARKS_FILE
 }
 
 
