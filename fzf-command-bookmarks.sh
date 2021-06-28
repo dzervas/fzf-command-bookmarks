@@ -24,11 +24,9 @@ function __ehc() {
 
 function _fzf_command_bookmark_show() {
 	local result=$(cat $FZF_COMMAND_BOOKMARKS_FILE | \
-		fzf --delimiter "##" --print0 --height 40% --header Bookmarks --with-nth 2 \
-		--preview 'echo -e {2}; echo; echo -E {1} | highlight -S bash -O ansi' \
-		--preview-window=wrap --tac | cut -d'#' -f1)
-	# The `cut` above uses a single hashtag as a delimiter, but we need only
-	# the first part so it's fine
+		fzf --delimiter "##" --print0 --height 40% --header Bookmarks --with-nth -1 \
+		--preview 'echo -e {-1}; echo; echo -E {..-2} | highlight -S bash -O ansi' \
+		--preview-window=wrap --tac | sed 's/\(.*\)##.*/\1/')
 
 	if [ -z "$ZSH_VERSION" ]; then
 		__ehc "$result"
